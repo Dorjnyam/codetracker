@@ -19,7 +19,7 @@ async function main() {
       totalXP: 1000,
       level: 10,
       streak: 30,
-      preferredLanguages: ['JavaScript', 'Python', 'TypeScript'],
+      preferredLanguages: 'JavaScript,Python,TypeScript',
       institution: 'CodeTracker University',
       bio: 'System administrator for CodeTracker platform',
     },
@@ -38,7 +38,7 @@ async function main() {
       totalXP: 2500,
       level: 15,
       streak: 45,
-      preferredLanguages: ['Python', 'Java', 'C++'],
+      preferredLanguages: 'Python,Java,C++',
       institution: 'Tech University',
       bio: 'Computer Science Professor specializing in algorithms and data structures',
     },
@@ -55,7 +55,7 @@ async function main() {
       totalXP: 1800,
       level: 12,
       streak: 25,
-      preferredLanguages: ['JavaScript', 'TypeScript', 'React'],
+      preferredLanguages: 'JavaScript,TypeScript,React',
       institution: 'Tech University',
       bio: 'Full-stack development instructor with 10+ years industry experience',
     },
@@ -75,7 +75,7 @@ async function main() {
         totalXP: 450,
         level: 3,
         streak: 7,
-        preferredLanguages: ['Python', 'JavaScript'],
+        preferredLanguages: 'Python,JavaScript',
         institution: 'Tech University',
         bio: 'Computer Science student passionate about web development',
       },
@@ -91,7 +91,7 @@ async function main() {
         totalXP: 320,
         level: 2,
         streak: 3,
-        preferredLanguages: ['Java', 'Python'],
+        preferredLanguages: 'Java,Python',
         institution: 'Tech University',
         bio: 'Software engineering student interested in mobile development',
       },
@@ -107,7 +107,7 @@ async function main() {
         totalXP: 680,
         level: 4,
         streak: 12,
-        preferredLanguages: ['JavaScript', 'TypeScript', 'React'],
+        preferredLanguages: 'JavaScript,TypeScript,React',
         institution: 'Tech University',
         bio: 'Frontend development enthusiast and open source contributor',
       },
@@ -123,7 +123,7 @@ async function main() {
         totalXP: 890,
         level: 5,
         streak: 18,
-        preferredLanguages: ['Python', 'C++', 'JavaScript'],
+        preferredLanguages: 'Python,C++,JavaScript',
         institution: 'Tech University',
         bio: 'Competitive programmer and algorithm enthusiast',
       },
@@ -139,7 +139,7 @@ async function main() {
         totalXP: 1200,
         level: 6,
         streak: 22,
-        preferredLanguages: ['Python', 'Java', 'JavaScript'],
+        preferredLanguages: 'Python,Java,JavaScript',
         institution: 'Tech University',
         bio: 'Full-stack developer in training with focus on AI/ML',
       },
@@ -157,11 +157,11 @@ async function main() {
       inviteCode: 'CS101-FALL2024',
       semester: 'Fall 2024',
       isActive: true,
-      settings: {
+      settings: JSON.stringify({
         allowLateSubmissions: true,
         maxLateDays: 3,
         gradingPolicy: 'points',
-      },
+      }),
     },
   });
 
@@ -173,11 +173,11 @@ async function main() {
       inviteCode: 'CS201-FALL2024',
       semester: 'Fall 2024',
       isActive: true,
-      settings: {
+      settings: JSON.stringify({
         allowLateSubmissions: false,
         collaborationEnabled: true,
         gradingPolicy: 'weighted',
-      },
+      }),
     },
   });
 
@@ -189,12 +189,12 @@ async function main() {
       inviteCode: 'WEB301-FALL2024',
       semester: 'Fall 2024',
       isActive: true,
-      settings: {
+      settings: JSON.stringify({
         allowLateSubmissions: true,
         maxLateDays: 2,
         collaborationEnabled: true,
         gradingPolicy: 'points',
-      },
+      }),
     },
   });
 
@@ -235,26 +235,32 @@ async function main() {
     data: {
       title: 'Hello World Program',
       description: 'Create your first Python program that prints "Hello, World!"',
+      instructions: 'Write a Python program that prints "Hello, World!" to the console.',
       classId: class1.id,
-      creatorId: teacher1.id,
+      teacherId: teacher1.id,
       difficulty: Difficulty.EASY,
       language: 'Python',
-      maxScore: 100,
+      status: 'PUBLISHED',
+      points: 100,
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-      isActive: true,
-      testCases: [
+      timeLimit: 30,
+      maxAttempts: 5,
+      testCases: JSON.stringify([
         {
+          id: 'test1',
           input: '',
           expectedOutput: 'Hello, World!',
-          isHidden: false,
-          description: 'Basic hello world test',
+          isPublic: true,
+          points: 100,
         },
-      ],
-      starterCode: '# Write your code here\nprint("Hello, World!")',
-      instructions: 'Write a Python program that prints "Hello, World!" to the console.',
-      allowLateSubmission: true,
-      maxAttempts: 5,
-      timeLimit: 30,
+      ]),
+      starterCode: JSON.stringify([
+        {
+          language: 'python',
+          code: '# Write your code here\nprint("Hello, World!")',
+        },
+      ]),
+      resources: JSON.stringify([]),
     },
   });
 
@@ -262,44 +268,53 @@ async function main() {
     data: {
       title: 'FizzBuzz Challenge',
       description: 'Implement the classic FizzBuzz algorithm',
+      instructions: 'Implement a function that returns "Fizz" for numbers divisible by 3, "Buzz" for numbers divisible by 5, "FizzBuzz" for numbers divisible by both, and the number itself otherwise.',
       classId: class1.id,
-      creatorId: teacher1.id,
+      teacherId: teacher1.id,
       difficulty: Difficulty.MEDIUM,
       language: 'Python',
-      maxScore: 100,
+      status: 'PUBLISHED',
+      points: 100,
       dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
-      isActive: true,
-      testCases: [
+      timeLimit: 60,
+      maxAttempts: 3,
+      testCases: JSON.stringify([
         {
+          id: 'test1',
           input: '15',
           expectedOutput: 'FizzBuzz',
-          isHidden: false,
-          description: 'Number divisible by both 3 and 5',
+          isPublic: true,
+          points: 25,
         },
         {
+          id: 'test2',
           input: '9',
           expectedOutput: 'Fizz',
-          isHidden: false,
-          description: 'Number divisible by 3',
+          isPublic: true,
+          points: 25,
         },
         {
+          id: 'test3',
           input: '10',
           expectedOutput: 'Buzz',
-          isHidden: false,
-          description: 'Number divisible by 5',
+          isPublic: true,
+          points: 25,
         },
         {
+          id: 'test4',
           input: '7',
           expectedOutput: '7',
-          isHidden: true,
-          description: 'Number not divisible by 3 or 5',
+          isPublic: false,
+          points: 25,
         },
-      ],
-      starterCode: 'def fizzbuzz(n):\n    # Your implementation here\n    pass',
-      instructions: 'Implement a function that returns "Fizz" for numbers divisible by 3, "Buzz" for numbers divisible by 5, "FizzBuzz" for numbers divisible by both, and the number itself otherwise.',
-      allowLateSubmission: true,
-      maxAttempts: 3,
-      timeLimit: 60,
+      ]),
+      starterCode: JSON.stringify([
+        {
+          language: 'python',
+          code: 'def fizzbuzz(n):\n    # Your implementation here\n    pass',
+        },
+      ]),
+      resources: JSON.stringify([]),
     },
   });
 
@@ -307,38 +322,46 @@ async function main() {
     data: {
       title: 'Binary Search Implementation',
       description: 'Implement binary search algorithm with proper error handling',
+      instructions: 'Implement binary search that returns the index of the target element, or -1 if not found. Handle edge cases like empty arrays.',
       classId: class2.id,
-      creatorId: teacher1.id,
+      teacherId: teacher1.id,
       difficulty: Difficulty.HARD,
       language: 'Python',
-      maxScore: 100,
+      status: 'PUBLISHED',
+      points: 100,
       dueDate: new Date(Date.now() + 21 * 24 * 60 * 60 * 1000), // 21 days from now
-      isActive: true,
-      testCases: [
+      timeLimit: 90,
+      maxAttempts: 2,
+      testCases: JSON.stringify([
         {
+          id: 'test1',
           input: '[1, 2, 3, 4, 5], 3',
           expectedOutput: '2',
-          isHidden: false,
-          description: 'Element found in middle',
+          isPublic: true,
+          points: 33,
         },
         {
+          id: 'test2',
           input: '[1, 2, 3, 4, 5], 6',
           expectedOutput: '-1',
-          isHidden: false,
-          description: 'Element not found',
+          isPublic: true,
+          points: 33,
         },
         {
+          id: 'test3',
           input: '[], 1',
           expectedOutput: '-1',
-          isHidden: true,
-          description: 'Empty array',
+          isPublic: false,
+          points: 34,
         },
-      ],
-      starterCode: 'def binary_search(arr, target):\n    # Your implementation here\n    pass',
-      instructions: 'Implement binary search that returns the index of the target element, or -1 if not found. Handle edge cases like empty arrays.',
-      allowLateSubmission: false,
-      maxAttempts: 2,
-      timeLimit: 90,
+      ]),
+      starterCode: JSON.stringify([
+        {
+          language: 'python',
+          code: 'def binary_search(arr, target):\n    # Your implementation here\n    pass',
+        },
+      ]),
+      resources: JSON.stringify([]),
     },
   });
 
@@ -346,64 +369,75 @@ async function main() {
     data: {
       title: 'React Todo App',
       description: 'Build a complete todo application with React',
+      instructions: 'Create a React todo application with the following features: add todos, mark as complete, delete todos, and filter by status.',
       classId: class3.id,
-      creatorId: teacher2.id,
+      teacherId: teacher2.id,
       difficulty: Difficulty.MEDIUM,
       language: 'JavaScript',
-      maxScore: 150,
+      status: 'PUBLISHED',
+      points: 150,
       dueDate: new Date(Date.now() + 28 * 24 * 60 * 60 * 1000), // 28 days from now
-      isActive: true,
-      testCases: [
+      timeLimit: 120,
+      maxAttempts: 3,
+      testCases: JSON.stringify([
         {
+          id: 'test1',
           input: 'Add todo "Learn React"',
           expectedOutput: 'Todo added successfully',
-          isHidden: false,
-          description: 'Add new todo item',
+          isPublic: true,
+          points: 50,
         },
         {
+          id: 'test2',
           input: 'Complete todo 1',
           expectedOutput: 'Todo marked as complete',
-          isHidden: false,
-          description: 'Mark todo as complete',
+          isPublic: true,
+          points: 50,
         },
         {
+          id: 'test3',
           input: 'Delete todo 1',
           expectedOutput: 'Todo deleted successfully',
-          isHidden: true,
-          description: 'Delete todo item',
+          isPublic: false,
+          points: 50,
         },
-      ],
-      starterCode: '// React component starter code\nimport React, { useState } from \'react\';\n\nconst TodoApp = () => {\n  // Your implementation here\n  return (\n    <div>\n      {/* Todo app UI */}\n    </div>\n  );\n};\n\nexport default TodoApp;',
-      instructions: 'Create a React todo application with the following features: add todos, mark as complete, delete todos, and filter by status.',
-      allowLateSubmission: true,
-      maxAttempts: 3,
-      timeLimit: 120,
+      ]),
+      starterCode: JSON.stringify([
+        {
+          language: 'javascript',
+          code: '// React component starter code\nimport React, { useState } from \'react\';\n\nconst TodoApp = () => {\n  // Your implementation here\n  return (\n    <div>\n      {/* Todo app UI */}\n    </div>\n  );\n};\n\nexport default TodoApp;',
+        },
+      ]),
+      resources: JSON.stringify([]),
     },
   });
 
   console.log('✅ Assignments created successfully');
 
   // Create sample submissions
-  await prisma.submission.createMany({
+  await prisma.assignmentSubmission.createMany({
     data: [
       {
         assignmentId: assignment1.id,
         studentId: students[0].id,
         code: 'print("Hello, World!")',
         language: 'Python',
-        status: 'PASSED',
+        status: 'GRADED',
         score: 100,
         maxScore: 100,
-        testResults: {
-          passed: 1,
-          total: 1,
-          details: [{ test: 'Basic hello world test', passed: true }],
-        },
+        attempts: 1,
+        testResults: JSON.stringify([
+          {
+            testCaseId: 'test1',
+            passed: true,
+            output: 'Hello, World!',
+            expectedOutput: 'Hello, World!',
+            pointsAwarded: 100,
+          },
+        ]),
         feedback: 'Excellent work! Perfect implementation.',
         executionTime: 15.5,
         memoryUsage: 2.1,
-        attemptNumber: 1,
-        isLate: false,
         gradedAt: new Date(),
       },
       {
@@ -411,19 +445,23 @@ async function main() {
         studentId: students[1].id,
         code: 'print("Hello World")',
         language: 'Python',
-        status: 'FAILED',
+        status: 'GRADED',
         score: 0,
         maxScore: 100,
-        testResults: {
-          passed: 0,
-          total: 1,
-          details: [{ test: 'Basic hello world test', passed: false, expected: 'Hello, World!', actual: 'Hello World' }],
-        },
+        attempts: 1,
+        testResults: JSON.stringify([
+          {
+            testCaseId: 'test1',
+            passed: false,
+            output: 'Hello World',
+            expectedOutput: 'Hello, World!',
+            errorMessage: 'Output mismatch',
+            pointsAwarded: 0,
+          },
+        ]),
         feedback: 'Almost correct! Remember the comma and exclamation mark.',
         executionTime: 12.3,
         memoryUsage: 1.8,
-        attemptNumber: 1,
-        isLate: false,
         gradedAt: new Date(),
       },
       {
@@ -439,24 +477,43 @@ async function main() {
     else:
         return str(n)`,
         language: 'Python',
-        status: 'PASSED',
+        status: 'GRADED',
         score: 100,
         maxScore: 100,
-        testResults: {
-          passed: 4,
-          total: 4,
-          details: [
-            { test: 'Number divisible by both 3 and 5', passed: true },
-            { test: 'Number divisible by 3', passed: true },
-            { test: 'Number divisible by 5', passed: true },
-            { test: 'Number not divisible by 3 or 5', passed: true },
-          ],
-        },
+        attempts: 1,
+        testResults: JSON.stringify([
+          {
+            testCaseId: 'test1',
+            passed: true,
+            output: 'FizzBuzz',
+            expectedOutput: 'FizzBuzz',
+            pointsAwarded: 25,
+          },
+          {
+            testCaseId: 'test2',
+            passed: true,
+            output: 'Fizz',
+            expectedOutput: 'Fizz',
+            pointsAwarded: 25,
+          },
+          {
+            testCaseId: 'test3',
+            passed: true,
+            output: 'Buzz',
+            expectedOutput: 'Buzz',
+            pointsAwarded: 25,
+          },
+          {
+            testCaseId: 'test4',
+            passed: true,
+            output: '7',
+            expectedOutput: '7',
+            pointsAwarded: 25,
+          },
+        ]),
         feedback: 'Perfect implementation! Great job handling all edge cases.',
         executionTime: 8.7,
         memoryUsage: 1.5,
-        attemptNumber: 1,
-        isLate: false,
         gradedAt: new Date(),
       },
     ],
@@ -473,7 +530,7 @@ async function main() {
         icon: '🎯',
         category: 'milestone',
         xpReward: 50,
-        requirement: { type: 'submissions', count: 1 },
+        requirement: JSON.stringify({ type: 'submissions', count: 1 }),
         isActive: true,
       },
     }),
@@ -484,7 +541,7 @@ async function main() {
         icon: '⚔️',
         category: 'milestone',
         xpReward: 200,
-        requirement: { type: 'submissions', count: 10 },
+        requirement: JSON.stringify({ type: 'submissions', count: 10 }),
         isActive: true,
       },
     }),
@@ -495,7 +552,7 @@ async function main() {
         icon: '🔥',
         category: 'streak',
         xpReward: 100,
-        requirement: { type: 'streak', days: 7 },
+        requirement: JSON.stringify({ type: 'streak', days: 7 }),
         isActive: true,
       },
     }),
@@ -506,7 +563,7 @@ async function main() {
         icon: '🐍',
         category: 'language',
         xpReward: 150,
-        requirement: { type: 'language_mastery', language: 'Python', score: 1000 },
+        requirement: JSON.stringify({ type: 'language_mastery', language: 'Python', score: 1000 }),
         isActive: true,
       },
     }),
@@ -517,7 +574,7 @@ async function main() {
         icon: '💯',
         category: 'performance',
         xpReward: 75,
-        requirement: { type: 'perfect_score', count: 1 },
+        requirement: JSON.stringify({ type: 'perfect_score', count: 1 }),
         isActive: true,
       },
     }),
@@ -546,28 +603,28 @@ async function main() {
         userId: students[0].id,
         type: ActivityType.SUBMISSION_CREATED,
         description: 'Submitted Hello World Program',
-        metadata: { assignmentId: assignment1.id, score: 100 },
+        metadata: JSON.stringify({ assignmentId: assignment1.id, score: 100 }),
         xpEarned: 50,
       },
       {
         userId: students[0].id,
         type: ActivityType.ACHIEVEMENT_UNLOCKED,
         description: 'Unlocked achievement: First Steps',
-        metadata: { achievementId: achievements[0].id },
+        metadata: JSON.stringify({ achievementId: achievements[0].id }),
         xpEarned: 50,
       },
       {
         userId: students[2].id,
         type: ActivityType.SUBMISSION_CREATED,
         description: 'Submitted FizzBuzz Challenge',
-        metadata: { assignmentId: assignment2.id, score: 100 },
+        metadata: JSON.stringify({ assignmentId: assignment2.id, score: 100 }),
         xpEarned: 50,
       },
       {
         userId: students[2].id,
         type: ActivityType.ACHIEVEMENT_UNLOCKED,
         description: 'Unlocked achievement: Perfect Score',
-        metadata: { achievementId: achievements[4].id },
+        metadata: JSON.stringify({ achievementId: achievements[4].id }),
         xpEarned: 75,
       },
     ],
@@ -583,7 +640,7 @@ async function main() {
         title: 'Assignment Graded',
         message: 'Your Hello World Program has been graded. Score: 0/100',
         type: NotificationType.SUBMISSION_GRADED,
-        metadata: { assignmentId: assignment1.id, score: 0 },
+        metadata: JSON.stringify({ assignmentId: assignment1.id, score: 0 }),
         isRead: false,
       },
       {
@@ -591,7 +648,7 @@ async function main() {
         title: 'Achievement Unlocked!',
         message: 'Congratulations! You unlocked the "Perfect Score" achievement.',
         type: NotificationType.ACHIEVEMENT_UNLOCKED,
-        metadata: { achievementId: achievements[4].id },
+        metadata: JSON.stringify({ achievementId: achievements[4].id }),
         isRead: true,
       },
       {
@@ -599,7 +656,7 @@ async function main() {
         title: 'New Assignment Available',
         message: 'FizzBuzz Challenge is now available in CS101',
         type: NotificationType.ASSIGNMENT_DUE,
-        metadata: { assignmentId: assignment2.id },
+        metadata: JSON.stringify({ assignmentId: assignment2.id }),
         isRead: false,
       },
     ],
@@ -615,7 +672,7 @@ async function main() {
       classId: class1.id,
       authorId: teacher1.id,
       isPinned: true,
-      tags: ['welcome', 'introduction'],
+      tags: 'welcome,introduction',
     },
   });
 
@@ -625,7 +682,7 @@ async function main() {
       content: 'I\'m having trouble with the Hello World program. Can someone help me understand the syntax?',
       classId: class1.id,
       authorId: students[1].id,
-      tags: ['help', 'python', 'syntax'],
+      tags: 'help,python,syntax',
     },
   });
 
@@ -657,7 +714,7 @@ async function main() {
   console.log(`- Users: ${await prisma.user.count()}`);
   console.log(`- Classes: ${await prisma.class.count()}`);
   console.log(`- Assignments: ${await prisma.assignment.count()}`);
-  console.log(`- Submissions: ${await prisma.submission.count()}`);
+  console.log(`- Submissions: ${await prisma.assignmentSubmission.count()}`);
   console.log(`- Achievements: ${await prisma.achievement.count()}`);
   console.log(`- Activities: ${await prisma.activity.count()}`);
   console.log(`- Notifications: ${await prisma.notification.count()}`);

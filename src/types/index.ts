@@ -1,4 +1,4 @@
-import { User, Role, ClassMemberRole, Difficulty, SubmissionStatus, CollaborationType, ActivityType, NotificationType } from '@prisma/client';
+import { User, Role, Difficulty, SubmissionStatus } from '@prisma/client';
 
 // Extend NextAuth types
 declare module 'next-auth' {
@@ -9,11 +9,15 @@ declare module 'next-auth' {
       name?: string | null;
       image?: string | null;
       role: Role;
+      username?: string | null;
+      githubUsername?: string | null;
     };
   }
 
   interface User {
     role: Role;
+    username?: string | null;
+    githubUsername?: string | null;
   }
 }
 
@@ -21,6 +25,8 @@ declare module 'next-auth/jwt' {
   interface JWT {
     role: Role;
     id: string;
+    username?: string | null;
+    githubUsername?: string | null;
   }
 }
 
@@ -175,7 +181,7 @@ export interface SocketEvents {
   'join-room': (roomId: string) => void;
   'leave-room': (roomId: string) => void;
   'code-change': (data: { roomId: string; code: string; userId: string }) => void;
-  'cursor-position': (data: { roomId: string; position: any; userId: string }) => void;
+  'cursor-position': (data: { roomId: string; position: { line: number; column: number }; userId: string }) => void;
   'user-joined': (data: { roomId: string; user: User }) => void;
   'user-left': (data: { roomId: string; userId: string }) => void;
   'submission-update': (data: { submissionId: string; status: SubmissionStatus }) => void;
@@ -183,7 +189,7 @@ export interface SocketEvents {
 }
 
 // API Response types
-export interface ApiResponse<T = any> {
+export interface ApiResponse<T = unknown> {
   success: boolean;
   data?: T;
   error?: string;

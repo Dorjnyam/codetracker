@@ -5,7 +5,7 @@ export const signUpSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string(),
-  role: z.enum(['STUDENT', 'TEACHER']).default('STUDENT'),
+  role: z.enum(['STUDENT', 'TEACHER']),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ["confirmPassword"],
@@ -20,7 +20,7 @@ export const updateProfileSchema = z.object({
   name: z.string().min(2, 'Name must be at least 2 characters').optional(),
   bio: z.string().max(500, 'Bio must be less than 500 characters').optional(),
   githubUsername: z.string().min(1, 'GitHub username is required').optional(),
-  preferredLanguages: z.array(z.string()).default([]),
+  preferredLanguages: z.array(z.string()).optional(),
   institution: z.string().optional(),
 });
 
