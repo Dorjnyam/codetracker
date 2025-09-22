@@ -1,0 +1,420 @@
+// CodeTracker Prisma Schema
+// Complete database schema for student-teacher coding platform
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Authentication & Users
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id                String    @id @default(cuid())
+  name              String?
+  email             String    @unique
+  emailVerified     DateTime?
+  image             String?
+  username          String?   @unique
+  bio               String?
+  role              Role      @default(STUDENT)
+  githubUsername    String?
+  preferredLanguages String[] @default([])
+  institution       String?
+  totalXP           Int       @default(0)
+  level             Int       @default(1)
+  streak            Int       @default(0)
+  lastActiveDate    DateTime?
+  settings          Json      @default("{}")
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  // Relations
+  accounts          Account[]
+  sessions          Session[]
+  ownedClasses      Class[]           @relation("ClassOwner")
+  classMembers      ClassMember[]
+  assignments       Assignment[]      @relation("AssignmentCreator")
+  submissions       Submission[]
+  activities        Activity[]
+  achievements      UserAchievement[]
+  givenReviews      CodeReview[]      @relation("Reviewer")
+  receivedReviews   CodeReview[]      @relation("Reviewee")
+  notifications     Notification[]
+  collaborations    Collaboration[]
+  forumPosts        ForumPost[]
+  forumComments     ForumComment[]
+
+  @@index([email])
+  @@index([role])
+  @@index([totalXP])
+  @@index([level])
+  @@index([streak])
+  @@index([lastActiveDate])
+  @@map("users")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// Classes & Memberships
+model Class {
+  id           String   @id @default(cuid())
+  name         String
+  description  String?
+  ownerId      String
+  inviteCode   String   @unique
+  semester     String?
+  isActive     Boolean  @default(true)
+  settings     Json     @default("{}")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  // Relations
+  owner        User              @relation("ClassOwner", fields: [ownerId], references: [id])
+  members      ClassMember[]
+  assignments  Assignment[]
+  forums       ForumPost[]
+
+  @@index([ownerId])
+  @@index([inviteCode])
+  @@index([isActive])
+  @@index([createdAt])
+  @@map("classes")
+}
+
+model ClassMember {
+  id       String          @id @default(cuid())
+  classId  String
+  userId   String
+  role     ClassMemberRole @default(STUDENT)
+  joinedAt DateTime        @default(now())
+
+  // Relations
+  class Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  user  User  @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, userId])
+  @@map("class_members")
+}
+
+// Assignments & Submissions
+model Assignment {
+  id              String           @id @default(cuid())
+  title           String
+  description     String
+  classId         String
+  creatorId       String
+  difficulty      Difficulty       @default(MEDIUM)
+  language        String
+  maxScore        Int              @default(100)
+  dueDate         DateTime?
+  isActive        Boolean          @default(true)
+  testCases       Json             @default("[]")
+  starterCode     String?
+  instructions    String
+  rubric          Json             @default("{}")
+  allowLateSubmission Boolean      @default(false)
+  maxAttempts     Int?
+  timeLimit       Int?             // in minutes
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  // Relations
+  class           Class            @relation(fields: [classId], references: [id], onDelete: Cascade)
+  creator         User             @relation("AssignmentCreator", fields: [creatorId], references: [id])
+  submissions     Submission[]
+  collaborations  Collaboration[]
+  codeReviews     CodeReview[]
+
+  @@index([classId])
+  @@index([creatorId])
+  @@index([difficulty])
+  @@index([language])
+  @@index([dueDate])
+  @@index([isActive])
+  @@index([createdAt])
+  @@map("assignments")
+}
+
+model Submission {
+  id           String           @id @default(cuid())
+  assignmentId String
+  studentId    String
+  code         String
+  language     String
+  status       SubmissionStatus @default(PENDING)
+  score        Int?
+  maxScore     Int              @default(100)
+  testResults  Json             @default("{}")
+  feedback     String?
+  executionTime Float?           // in milliseconds
+  memoryUsage  Float?           // in MB
+  attemptNumber Int             @default(1)
+  isLate       Boolean          @default(false)
+  submittedAt  DateTime         @default(now())
+  gradedAt     DateTime?
+
+  // Relations
+  assignment   Assignment     @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student      User           @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  codeReviews  CodeReview[]
+
+  @@index([assignmentId])
+  @@index([studentId])
+  @@index([status])
+  @@index([score])
+  @@index([submittedAt])
+  @@index([isLate])
+  @@map("submissions")
+}
+
+// Code Reviews
+model CodeReview {
+  id           String     @id @default(cuid())
+  submissionId String?
+  assignmentId String?
+  reviewerId   String
+  revieweeId   String
+  rating       Int?       @default(0) // 1-5 stars
+  comments     String
+  suggestions  String?
+  isCompleted  Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  // Relations
+  submission   Submission? @relation(fields: [submissionId], references: [id], onDelete: Cascade)
+  assignment   Assignment? @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  reviewer     User        @relation("Reviewer", fields: [reviewerId], references: [id])
+  reviewee     User        @relation("Reviewee", fields: [revieweeId], references: [id])
+
+  @@map("code_reviews")
+}
+
+// Collaboration & Live Coding
+model Collaboration {
+  id           String              @id @default(cuid())
+  assignmentId String
+  name         String
+  description  String?
+  type         CollaborationType   @default(PAIR_PROGRAMMING)
+  maxParticipants Int             @default(2)
+  isActive     Boolean            @default(true)
+  roomId       String             @unique
+  sharedCode   String?
+  language     String
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+
+  // Relations
+  assignment   Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  participants User[]
+
+  @@map("collaborations")
+}
+
+// Gamification
+model Achievement {
+  id          String @id @default(cuid())
+  name        String @unique
+  description String
+  icon        String
+  category    String
+  xpReward    Int    @default(0)
+  requirement Json   // Conditions to unlock
+  isActive    Boolean @default(true)
+  createdAt   DateTime @default(now())
+
+  // Relations
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String   @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime @default(now())
+  progress      Json     @default("{}")
+
+  // Relations
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+// Activity Tracking
+model Activity {
+  id          String       @id @default(cuid())
+  userId      String
+  type        ActivityType
+  description String
+  metadata    Json         @default("{}")
+  xpEarned    Int          @default(0)
+  createdAt   DateTime     @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([type])
+  @@index([createdAt])
+  @@index([xpEarned])
+  @@map("activities")
+}
+
+// Forums & Discussions
+model ForumPost {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  classId   String
+  authorId  String
+  isPinned  Boolean  @default(false)
+  isLocked  Boolean  @default(false)
+  tags      String[] @default([])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  class    Class          @relation(fields: [classId], references: [id], onDelete: Cascade)
+  author   User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  comments ForumComment[]
+
+  @@map("forum_posts")
+}
+
+model ForumComment {
+  id        String   @id @default(cuid())
+  content   String
+  postId    String
+  authorId  String
+  parentId  String?  // For nested comments
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  post     ForumPost      @relation(fields: [postId], references: [id], onDelete: Cascade)
+  author   User           @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent   ForumComment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies  ForumComment[] @relation("CommentReplies")
+
+  @@map("forum_comments")
+}
+
+// Notifications
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  title     String
+  message   String
+  type      NotificationType
+  isRead    Boolean          @default(false)
+  metadata  Json             @default("{}")
+  createdAt DateTime         @default(now())
+
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([isRead])
+  @@index([type])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+// Enums
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+enum ClassMemberRole {
+  STUDENT
+  TEACHER
+  ASSISTANT
+}
+
+enum Difficulty {
+  EASY
+  MEDIUM
+  HARD
+  EXPERT
+}
+
+enum SubmissionStatus {
+  PENDING
+  RUNNING
+  PASSED
+  FAILED
+  PARTIAL
+  ERROR
+  TIMEOUT
+}
+
+enum CollaborationType {
+  PAIR_PROGRAMMING
+  GROUP_PROJECT
+  CODE_REVIEW
+  STUDY_SESSION
+}
+
+enum ActivityType {
+  SUBMISSION_CREATED
+  ASSIGNMENT_COMPLETED
+  LEVEL_UP
+  ACHIEVEMENT_UNLOCKED
+  CODE_REVIEWED
+  COLLABORATION_JOINED
+  STREAK_MILESTONE
+  FORUM_POST_CREATED
+}
+
+enum NotificationType {
+  ASSIGNMENT_DUE
+  SUBMISSION_GRADED
+  CODE_REVIEW_RECEIVED
+  ACHIEVEMENT_UNLOCKED
+  COLLABORATION_INVITE
+  FORUM_REPLY
+  SYSTEM_UPDATE
+}
